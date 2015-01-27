@@ -6,6 +6,5 @@ e.g. 192.168.1.1
 into its binary notation,
 e.g. 11000000.1010100.00000001.00000001
 
-Currently, you must enter the address one octet at a time. Parsing will be added in the near future.
-
-NOTE: As of the latest commit, error handling and sanity tests are broken.
+As of Version 0.6 you may enter a full IP address and it will be parsed automatically.
+As of Version 0.6 all error handling is broken, so verify that the IP address is valid if you are experiencing issues.
