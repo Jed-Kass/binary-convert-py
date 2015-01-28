@@ -1,4 +1,4 @@
-## Version 0.6
+## Version 1.0
 running = True # Prepare for the main loop
 running1 = True
 ip=[] # Prepare the list that will be used in the main loop.
@@ -7,18 +7,22 @@ def convert(octet): #Octet here refers to one of the 4 octets that make up a dec
 
     bin = [] # bin = Binary, as in the Binary octet
     
-    if len(octet) > 3:
-        print octet
-        return 1 # Checks that the octet in question is not more than 3 digits long.
-
-
+##    if len(octet) > 3:
+##        print octet
+##        return 1 # Checks that the octet in question is not more than 3 digits long.
+##
+##
     try:
         octet = int(octet)
-    except ValueError:
+    except ValueError, TypeError:
         return 2 # Tries to convert the octet to an integer, or at least fail gracefully.
 
-    if octet > 255:
-        return 3 # Checks that the octet isn't beyond the maximum of 255.
+    try:
+        str(octet)
+    except TypeError:
+        return 3
+##    if octet > 255:
+##        return 3 # Checks that the octet isn't beyond the maximum of 255.
     
 
 
@@ -81,6 +85,16 @@ def convert(octet): #Octet here refers to one of the 4 octets that make up a dec
 
 
 
+def error_checker(octet):
+
+    if octet == 2:
+        return 2
+    elif octet == 3:
+        return 3
+    else:
+        return 0
+    
+
 ## ________________________________________________________________________________________________________
 ## Main Thread
 
@@ -89,56 +103,108 @@ while running1 == True: # For the sake of error handling, the main loop is held 
 
         ip = str(raw_input("Please enter the IP address: "))
         ip_holdout = ip
+        if ip.lower() == "quit":
+            running = False
+            running1 = False
+            break
+        
 
-
-
-        if len(ip) > 14:
+        if len(ip) > 15:
             print "One of the octets was too long. Please try again."
             break
-
+        error = 0
 
             
 
 
         
-        digit_counter=0
-        octet_counter=0
-        octet_holder=[]
+        digit_counter=0 ## Keep count of the number of digits we've progressed for the sake of removing unneeded portions of our IP address.
+        octet_counter=0 ## Keeps track of the number of octets for the sake of placing said octet into octet_holder[].
+        octet_holder=[] ## Holds the octets in a list.
          
         for octet in ip:
-            if octet == ".":
-                octet_holder.append(ip[:digit_counter])
-                ip = ip[digit_counter+1:len(ip)]
+            if octet != ".":
+                try:
+                    int(octet)
+                except ValueError:
+                    error = 1
+                    break
+            if octet == ".": ## Checks whether we've reached the period after an octet, which helps parse the address.
+                octet_holder.append(ip[:digit_counter]) ## Appends to octet_holder[] the octet up to (but not including) the period.
+                ip = ip[digit_counter+1:len(ip)] ## Trashes the first octet and its period.
                 
 
+                try: ## Error checking
+                    int(octet_holder[octet_counter]) ## Ensuring the currently handled octet is actually a number and ONLY a number.
+                except ValueError:
+                    error = 1
+                    break
                 try:
                     int(octet_holder[octet_counter])
-                except ValueError:
-                    print "Only numbers and periods are allowed. Please try again."
+                    str(octet_holder[octet_counter])
+                except TypeError: # Checks for illegal characters
+                    error = 4
                     break
-                if int(octet_holder[octet_counter]) > 255:
-                    print "One of the octets is too large. The max allowed is 255."
-                    break
+                if int(octet_holder[octet_counter]) > 255: ## Ensure no numbers greater than 255 get through (which screws with the math).
+                    error = 2
+                    break ## End error checking
                     
-                octet_counter = octet_counter + 1
-                digit_counter = 0
+                octet_counter = octet_counter + 1 ## Prepare for adding the next octet
+                digit_counter = 0 ## Reset the digit counter.
                 
 
-                
-            elif octet_counter == 3:
-                octet_holder.append(ip)
-                break
+            elif octet_counter == 3: ## Workaround for the fourth octet. Checks if we've dealt with the first 3 octets, then simply appends the rest to the final octet.
+                octet_holder.append(ip) ## Doing it this way breaks error checking for the final octet.
             
-            else:
+
+                try: ## Error Checking for our fourth octet.
+                    int(octet_holder[3])
+                except ValueError:
+                    error = 1
+                    break
+                try:
+                    int(octet_holder[3])
+                except TypeError:
+                    error = 4
+
+                if int(octet_holder[3]) > 255:
+                    error = 2
+                    break
+                else:
+                    break
+            else: ## End Error Checking.
                 digit_counter=digit_counter+1
+
+
+        for items in octet_holder:
+            if error_checker(items) == 2:
+                error = 1
+                break
+
+            
+        if error == 1: ## Remember that error checking from the for: loop?
+            print "Only numbers and periods are allowed. Please try again."
+            break
+        if error == 2: ## Here's where it pays off.
+            print "One of the octets is too large. The max allowed is 255."
+            break
+        if error == 4:
+            print "Warning: Illegal character in octet. Please try again."
             
 
+
+            
         
+
         
         print "\n"
         print ip_holdout
         print "is..."
-        print convert(octet_holder[0]) + '.' + convert(octet_holder[1]) + '.' + convert(octet_holder[2]) + '.' + convert(octet_holder[3])
+        try:
+            print convert(octet_holder[0]) + '.' + convert(octet_holder[1]) + '.' + convert(octet_holder[2]) + '.' + convert(octet_holder[3])
+        except IndexError:
+            print "Warning: Illegal character[s]. Please try again."
+            break
         print "\n"
 
 
