@@ -13,9 +13,10 @@ As of Version 0.6 you may enter a full IP address and it will be parsed automati
 As of Version 1.0 all error checking is fixed and functioning. 
 
 
-Usage
+
 
 __________________
 
+Usage:
 
-Simply run the script via a python interpreter 2.7 or below, then follow the on-screen directive.
+Simply run the script (dtb2.py) via a python interpreter 2.7 or below, then follow the on-screen directive.
