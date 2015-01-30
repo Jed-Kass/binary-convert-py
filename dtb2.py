@@ -3,26 +3,28 @@ running = True # Prepare for the main loop
 running1 = True
 ip=[] # Prepare the list that will be used in the main loop.
 
+
+object = decimal.hello()
+print object
+
 def convert(octet): #Octet here refers to one of the 4 octets that make up a decimal IP address (e.g. octet.octet.octet.octet or 192.168.1.1)
 
-    bin = [] # bin = Binary, as in the Binary octet
+    binary = []
     
-##    if len(octet) > 3:
-##        print octet
-##        return 1 # Checks that the octet in question is not more than 3 digits long.
-##
-##
+        
     try:
         octet = int(octet)
     except ValueError, TypeError:
         return 2 # Tries to convert the octet to an integer, or at least fail gracefully.
-
+    
+    if octet == 0:
+        full_string = "00000000"
+        return full_string
+    
     try:
         str(octet)
     except TypeError:
         return 3
-##    if octet > 255:
-##        return 3 # Checks that the octet isn't beyond the maximum of 255.
     
 
 
@@ -31,55 +33,56 @@ def convert(octet): #Octet here refers to one of the 4 octets that make up a dec
                      # from that octet and append a 1 to the binary list. Search 'converting decimal to binary' to get a better sense of how this works.
                      
         if octet >= 128:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 128
         elif octet < 128:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 64:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 64
         elif octet < 64:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 32:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 32
         elif octet < 32:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 16:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 16
         elif octet < 16:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 8:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 8
         elif octet < 8:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 4:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 4
         elif octet < 4:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 2:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 2
         elif octet < 2:
-            bin.append(0)
+            binary.append(0)
 
         if octet >= 1:
-            bin.append(1)
+            binary.append(1)
             octet = octet - 1
-        elif octet < 1:
-            bin.append(0)
+        elif octet < 1 or octet == 0:
+            binary.append(0)
 
     full_string = ""
-    full_string = full_string + str(bin[0]) + str(bin[1]) + str(bin[2]) + str(bin[3]) + str(bin[4]) + str(bin[5]) + str(bin[6]) + str(bin[7])
+    for numerals in binary:
+        full_string = "".join((full_string, str(numerals)))
 
     return full_string # Return the list which will make up the resulting binary octet.
 
@@ -124,11 +127,13 @@ while running1 == True: # For the sake of error handling, the main loop is held 
          
         for octet in ip:
             if octet != ".":
+                
                 try:
                     int(octet)
                 except ValueError:
                     error = 1
                     break
+                
             if octet == ".": ## Checks whether we've reached the period after an octet, which helps parse the address.
                 octet_holder.append(ip[:digit_counter]) ## Appends to octet_holder[] the octet up to (but not including) the period.
                 ip = ip[digit_counter+1:len(ip)] ## Trashes the first octet and its period.
