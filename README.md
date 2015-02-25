@@ -19,4 +19,4 @@ __________________
 
 Usage:
 
-Simply run the script (dtb2.py) via a python interpreter 2.7 or below, then follow the on-screen directive.
+Simply run the script via Python2.7 or higher. Then follow the on-screen directive.
